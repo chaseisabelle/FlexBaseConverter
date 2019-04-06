@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="absolute"
+	creationComplete="creationComplete();"
+	width="415" height="50">
+	
+	<mx:Canvas
+		name="mainCanvas" id="canvas"
+		backgroundColor="0x000000"
+		width="100%" height="100%">
+		
+		<mx:VBox 
+			width="100%" height="100%">
+			
+			<mx:HBox
+				width="100%" height="50%">
+				
+				<mx:Label
+					width="50" height="100%"
+					fontFamily="Arial" fontSize="12"
+					color="0x00FF00"
+					text="Input:" />
+				
+				<mx:TextInput
+					name="textInput" id="textInput"
+					width="250" height="100%"
+					editable="true"
+					fontFamily="Arial" fontWeight="bold" fontSize="12"
+					color="0x00FF00" backgroundColor="0x000000"
+					borderStyle="solid" borderColor="0x00FF00"
+					change="textInputChange();" />
+					
+				<mx:Label
+					width="40" height="100%"
+					fontFamily="Arial" fontSize="12"
+					color="0x00FF00"
+					text="Base:" />
+					
+				<mx:ComboBox
+					name="inputBaseComboBox" id="inputBaseComboBox"
+					width="50" height="100%"
+					editable="false"
+					fontFamily="Arial" fontSize="9"
+					borderThickness="0"
+					dataProvider="{baseArrayCollection}"
+					change="inputBaseComboBoxChange();" />
+				
+			</mx:HBox>
+			
+			<mx:HBox
+				width="100%" height="50%">
+				
+				<mx:Label
+					width="50" height="100%"
+					fontFamily="Arial" fontSize="12"
+					color="0xFF0000"
+					text="Output:" />
+				
+				<mx:TextInput
+					name="textOutput" id="textOutput"
+					width="250" height="100%"
+					editable="false"
+					fontFamily="Arial" fontWeight="bold" fontSize="12"
+					color="0xFF0000" backgroundColor="0x000000"
+					borderStyle="solid" borderColor="0xFF0000" />
+					
+				<mx:Label
+					width="40" height="100%"
+					fontFamily="Arial" fontSize="12"
+					color="0xFF0000"
+					text="Base:" />
+					
+				<mx:ComboBox
+					name="outputBaseComboBox" id="outputBaseComboBox"
+					width="50" height="100%"
+					editable="false"
+					fontFamily="Arial" fontSize="9"
+					borderThickness="0"
+					dataProvider="{baseArrayCollection}"
+					change="outputBaseComboBoxChange();" />
+				
+			</mx:HBox>
+			
+		</mx:VBox>
+		
+	</mx:Canvas>
+	
+	<mx:Script>
+		<![CDATA[
+		
+			import mx.collections.ArrayCollection;
+			
+			private function creationComplete():void {
+				var selectedItem:uint;
+				
+				for (var base:uint = 2; base <= 10 + 26; base++) {
+					baseArrayCollection.addItem(base);
+					
+					if (base == 10) {
+						selectedItem = base;
+					}
+				}
+				
+				inputBaseComboBox.selectedItem = outputBaseComboBox.selectedItem = selectedItem;
+				
+				resetNumber();
+				resetInput();
+				resetOutput();
+				
+				restrictInput();
+			}
+			
+			private function textInputChange():void {
+				resetNumber();
+				resetOutput();
+			}
+			
+			private function inputBaseComboBoxChange():void {
+				restrictInput();
+				
+				resetInput();
+			}
+			
+			private function outputBaseComboBoxChange():void {
+				resetOutput();
+			}
+			
+			private function restrictInput():void {
+				var restrictions:String = "0";
+				var base:int = (int)(inputBaseComboBox.selectedItem);
+				
+				if (base < 2) {
+					throw new Error("Base cannot be less than 2!");
+				}
+				
+				if (base > 36) {
+					throw new Error("Base cannot be greater than 36!");
+				}
+				
+				for (var i:int = 2; i <= base; i++) {
+					if (i <= 10) {
+						restrictions += (i - 1).toString();
+					} else {
+						restrictions += Char.intToChar(i - 11);
+					}
+				}
+				
+				textInput.restrict = restrictions;
+			}
+			
+			private function resetNumber():void {
+				number = parseInt(textInput.text, int(inputBaseComboBox.selectedItem));
+			}
+			
+			private function resetInput():void {
+				isNaN(number) ? 
+					textInput.text = "" :
+					textInput.text = number.toString(int(inputBaseComboBox.selectedItem));
+			}
+			
+			private function resetOutput():void {
+				isNaN(number) ?
+					textOutput.text = "" :
+					textOutput.text = number.toString(int(outputBaseComboBox.selectedItem));
+			}
+			
+			private var baseArrayCollection:ArrayCollection = new ArrayCollection();
+			
+			private static var number:Number;
+			
+		]]>
+	</mx:Script>
+	
+</mx:Application>
